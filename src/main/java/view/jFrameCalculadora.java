@@ -325,7 +325,6 @@ public class jFrameCalculadora extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonNumero1ActionPerformed
 
     private void jButtonNumero1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButtonNumero1KeyPressed
-
         if ((evt.getKeyCode() == KeyEvent.VK_0)
                 || (evt.getKeyChar() == KeyEvent.VK_1)
                 || (evt.getKeyChar() == KeyEvent.VK_2)
@@ -342,16 +341,9 @@ public class jFrameCalculadora extends javax.swing.JFrame {
                 || (evt.getKeyChar() == KeyEvent.VK_MULTIPLY)
                 || (evt.getKeyChar() == KeyEvent.VK_EQUALS)) {
 
-            String tecla = "" + evt.getKeyChar();
-            if (tecla.equals("7")) {
-                tecla = "4";
-            }
-
-            this.maquinaEstadoFinitoCalculadora(tecla);
-
+            this.maquinaEstadoFinitoCalculadora("" + evt.getKeyChar());
         } else if (evt.getKeyCode() == KeyEvent.VK_L) {
-
-            this.maquinaEstadoFinitoCalculadora("+");
+            this.maquinaEstadoFinitoCalculadora("Limpar");
         }
     }//GEN-LAST:event_jButtonNumero1KeyPressed
 
@@ -368,98 +360,98 @@ public class jFrameCalculadora extends javax.swing.JFrame {
 
     private void maquinaEstadoFinitoCalculadora(String entrada) {
         switch (estado) {
+
+            // Estado 0 - início
             case 0:
+
                 if (entrada.matches("[0-9]")) {
-                    if (entrada.equals("0")) {
-                        display.setText("1");
-                    } else {
-                        display.setText(entrada);
-                    }
+
+                    display.setText(entrada);
                     estado = 1;
+
                 } else if (entrada.equals("Limpar")) {
-                    display.setText("0");
-                    estado = 1;
-                }
-                break;
-            case 1:
-                if (entrada.matches("[0-9]")) {
-                    if (entrada.equals("5")) {
-                        return;
-                    }
-                    display.setText(display.getText() + entrada);
-                } else if (entrada.equals("+")
-                        || entrada.equals("-")
-                        || entrada.equals("*")
-                        || entrada.equals("/")) {
-                    primeiroNumero = Double.parseDouble(display.getText());
-                    if (entrada.equals("+")) {
-                        operador = "-";
-                    } else {
-                        operador = entrada;
-                    }
+
                     display.setText("");
-                    estado = 2;
-                } else if (entrada.equals("Limpar")) {
-                    display.setText(String.valueOf(primeiroNumero));
                     estado = 0;
                 }
+
                 break;
-            case 2:
+
+            // Estado 1 - primeiro número sendo digitado
+            case 1:
+
                 if (entrada.matches("[0-9]")) {
-                    if (entrada.equals("9")) {
-                        display.setText("8");
-                    } else {
-                        display.setText(entrada);
-                    }
-                    estado = 3;
+
+                    display.setText(display.getText() + entrada);
+
                 } else if (entrada.equals("+")
                         || entrada.equals("-")
                         || entrada.equals("*")
                         || entrada.equals("/")) {
-                    if (entrada.equals("+")) {
-                        operador = "*";
-                    } else {
-                        operador = entrada;
-                    }
-                } else if (entrada.equals("Limpar")) {
+
+                    primeiroNumero = Double.parseDouble(display.getText());
+
+                    operador = entrada;
+
                     display.setText("");
+
                     estado = 2;
+
+                } else if (entrada.equals("Limpar")) {
+
+                    display.setText("");
+
+                    estado = 0;
                 }
+
                 break;
-            case 3:
+
+            // Estado 2 - operador escolhido
+            case 2:
+
                 if (entrada.matches("[0-9]")) {
-                    if (entrada.equals("3")) {
-                        display.setText(display.getText() + "33");
-                    } else {
-                        display.setText(display.getText() + entrada);
-                    }
+
+                    display.setText(entrada);
+
+                    estado = 3;
+
+                } else if (entrada.equals("Limpar")) {
+
+                    display.setText("");
+
+                    estado = 0;
+                }
+
+                break;
+
+            // Estado 3 - segundo número sendo digitado
+            case 3:
+
+                if (entrada.matches("[0-9]")) {
+
+                    display.setText(display.getText() + entrada);
+
                 } else if (entrada.equals("=")) {
+
                     segundoNumero = Double.parseDouble(display.getText());
+
                     switch (operador) {
+
                         case "+":
-                            calculadora.somar(
-                                    primeiroNumero,
-                                    segundoNumero
-                            );
+                            calculadora.somar(primeiroNumero, segundoNumero);
                             break;
+
                         case "-":
-                            calculadora.substrair(
-                                    primeiroNumero,
-                                    segundoNumero
-                            );
+                            calculadora.substrair(primeiroNumero, segundoNumero);
                             break;
+
                         case "*":
-                            calculadora.multiplicar(
-                                    primeiroNumero,
-                                    segundoNumero
-                            );
+                            calculadora.multiplicar(primeiroNumero, segundoNumero);
                             break;
+
                         case "/":
                             if (segundoNumero != 0) {
-                                calculadora.dividir(
-                                        primeiroNumero,
-                                        segundoNumero
-                                );
+                                calculadora.dividir(primeiroNumero, segundoNumero);
                             } else {
                                 display.setText("Erro");
                                 estado = 4;
@@ -467,43 +459,36 @@ public class jFrameCalculadora extends javax.swing.JFrame {
                             }
                             break;
                     }
-                    display.setText(
-                            String.valueOf(calculadora.resultado * 10)
-                    );
+
+                    display.setText(String.valueOf(calculadora.resultado));
+
                     estado = 4;
 
                 } else if (entrada.equals("Limpar")) {
-                    display.setText(
-                            String.valueOf(segundoNumero)
-                    );
+
+                    display.setText("");
+
                     estado = 0;
                 }
+
                 break;
 
+            // Estado 4 - resultado
             case 4:
-                if (entrada.matches("[0-9]")) {
-                    display.setText(display.getText() + entrada);
-                    estado = 1;
-                } else if (entrada.equals("+")
-                        || entrada.equals("-")
-                        || entrada.equals("*")
-                        || entrada.equals("/")) {
-                    primeiroNumero = 0;
-                    operador = entrada;
-                    display.setText("");
-                    estado = 2;
 
-                } else if (entrada.equals("=")) {
-                    display.setText(
-                            String.valueOf(
-                                    Double.parseDouble(display.getText()) + 1
-                            )
-                    );
+                if (entrada.matches("[0-9]")) {
+
+                    display.setText(entrada);
+
+                    estado = 1;
 
                 } else if (entrada.equals("Limpar")) {
-                    display.setText(display.getText());
+
+                    display.setText("");
+
                     estado = 0;
                 }
+
                 break;
         }
     }
