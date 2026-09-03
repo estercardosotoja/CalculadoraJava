@@ -1,4 +1,4 @@
-name: CI - Java Swing
+name: CI - Calculadora Java Swing
 
 on:
   push:
@@ -20,31 +20,40 @@ jobs:
 
     steps:
 
+      # Baixa o código do repositório
       - name: Checkout do código
         uses: actions/checkout@v5
 
-      - name: Configurar Java
+      # Configura o Java 26
+      - name: Configurar Java 26
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '26'
           cache: maven
 
-      - name: Verificar Java
-        run: java -version
+      # Verifica a versão instalada
+      - name: Verificar versão do Java
+        run: |
+          java -version
+          javac -version
 
+      # Compila o projeto
       - name: Compilar projeto
         run: mvn clean compile
 
+      # Executa os testes unitários
       - name: Executar testes unitários
         run: mvn test
 
+      # Gera o JAR
       - name: Gerar aplicação
         run: mvn package -DskipTests
 
+      # Disponibiliza o JAR como artefato
       - name: Upload do JAR
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: aplicacao-java-swing
+          name: calculadora-java
           path: target/*.jar
